@@ -2,17 +2,24 @@ var cluster = require('cluster'),
 		numCPUs = require('os').cpus().length
 
 if(cluster.isMaster) {
-	var worker, i;
+	var worker, i = 0;
 
-	for (i = 0; i < numCPUs; i++) {
-		worker = cluster.fork();
-		console.info('Workerer #'+ worker.id, 'with pid', worker.process.pid, 'is on')
+	while(i < numCPUs) {
+		cluster.fork()
+		i++
 	}
+	cluster.on('fork', function(worker){
+		console.log('forked worker  '+ worker.process.pid)
+	})
+
+	cluster.on('listneing', function(worker, address){
+		console.log('worker '+ worker.process.pid + " is now connected to " + address.address + ":" + address.port)
+	});
 
 	cluster.on('exit', function(worker, code, signal) {
-		console.info('Workerer #'+ worker.id, 'with pid', worker.process.pid, 'dir')
+		console.info('Worker '+ worker.process.pid + 'died')
 	})
 
 }else {
-	app = require('./app.js')
+	require('./app.js').base(cluster)
 }
