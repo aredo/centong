@@ -83,8 +83,7 @@ var pollingLoop = function () {
 
 // creating a new websocket to keep the content updated without any AJAX request
 io.sockets.on( 'connection', function ( socket ) {
-	
-	console.log('Number of connections:' + connectionsArray.length);
+	// console.log('Number of connections:' + connectionsArray.length);
 	// starting the loop only if at least there is one user connected
 	if (!connectionsArray.length) {
 		pollingLoop();
@@ -99,6 +98,7 @@ io.sockets.on( 'connection', function ( socket ) {
 	});
 
 	console.log( 'A new socket is connected!' );
+	
 	connectionsArray.push( socket );
 	
 });
@@ -108,7 +108,7 @@ var updateSockets = function ( data ) {
 	data.time = new Date();
 	// sending new data to all the sockets connected
 	connectionsArray.forEach(function( tmpSocket ){
-		tmpSocket.emit( 'startup' , data );
+		tmpSocket.volatile.emit( 'startup' , data );
 	});
 };
 
